@@ -90,7 +90,7 @@ class ColumnClassifier:
         """
         entity_counts = {'LOCATION': 0, 'ORGANIZATION': 0, 'PERSON': 0, 'OTHER': 0}
         literal_counts = {'NUMBER': 0, 'DATE': 0, 'STRING': 0}
-
+        print("text", text)
         # Count entities using SpaCy
         doc = self.nlp(text)
         for ent in doc.ents:
@@ -102,15 +102,16 @@ class ColumnClassifier:
 
         # Detect numbers using the float method
         number_count = sum(sample_data.apply(self.is_number))
-
+        
         # Average SpaCy's number prediction and float-based detection
-        literal_counts['NUMBER'] = (literal_counts['NUMBER'] + number_count) / 2
+        literal_counts['NUMBER'] = number_count
 
         # Count non-entities as STRING
         literal_counts['STRING'] += (num_rows - len(doc.ents) - number_count)
 
-        # Normalize the counts and ensure they do not exceed num_rows
-        probabilities = {key: round(self.normalize_count(count, num_rows) / num_rows, 2) for key, count in {**entity_counts, **literal_counts}.items() if count > 0}
+        # Normalize the counts and ensure they do not exceed sample size
+        probabilities = {key: round(self.normalize_count(count, num_rows) / num_rows, 2) 
+                         for key, count in {**entity_counts, **literal_counts}.items() if count > 0}
 
         # Default to 'STRING' if no entities detected
         if not probabilities:
@@ -158,7 +159,7 @@ class ColumnClassifier:
         non_na_data = column_data.dropna().astype(str)
         num_rows = len(non_na_data)
         sample_size = min(self.sample_size, num_rows)
-
+        
         if num_rows == 0:
             return {'classification': 'LIT (STRING)', 'probabilities': {'STRING': 1.0}}
 
@@ -171,8 +172,8 @@ class ColumnClassifier:
 
         concatenated_text = ' | '.join(sample_data.tolist())
 
-        probabilities = self.classify_text(concatenated_text, num_rows, sample_data)
-
+        probabilities = self.classify_text(concatenated_text, sample_size, sample_data)
+        print("probabilities", probabilities)
         # Apply classification threshold: use STRING if confidence is low
         max_prob = max(probabilities.values())
         if max_prob < self.classification_threshold:
