@@ -1,2 +1,8 @@
 # spacy-column-classifier
-Column classification tool using spaCy to categorize tabular data into high-level types like PERSON, LOCATION, NUMBER, and DATE.
+
+A Python package to classify DataFrame columns using spaCy.
+
+## Installation
+
+```bash
+pip install spacy-column-classifier
