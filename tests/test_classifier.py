@@ -6,7 +6,7 @@ import pandas as pd
 # Add the path to the spacy_column_classifier directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from spacy_column_classifier import ColumnClassifier
+from column_classifier import ColumnClassifier
 
 class TestColumnClassifier(unittest.TestCase):
     def test_basic_classification(self):
