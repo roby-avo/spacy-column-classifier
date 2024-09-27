@@ -90,7 +90,7 @@ class ColumnClassifier:
         """
         entity_counts = {'LOCATION': 0, 'ORGANIZATION': 0, 'PERSON': 0, 'OTHER': 0}
         literal_counts = {'NUMBER': 0, 'DATE': 0, 'STRING': 0}
-        print("text", text)
+       
         # Count entities using SpaCy
         doc = self.nlp(text)
         for ent in doc.ents:
@@ -173,7 +173,7 @@ class ColumnClassifier:
         concatenated_text = ' | '.join(sample_data.tolist())
 
         probabilities = self.classify_text(concatenated_text, sample_size, sample_data)
-        print("probabilities", probabilities)
+       
         # Apply classification threshold: use STRING if confidence is low
         max_prob = max(probabilities.values())
         if max_prob < self.classification_threshold:
