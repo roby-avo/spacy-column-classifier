@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='column_classifier',
+    name='column_classifier',  # This is the actual package name
     version='0.1.0',
     description='A column classifier using spaCy for entity recognition.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Roberto',
     author_email='roberto.avogadro@sintef.no',
-    url='https://github.com/roby-avo/spacy-column-classifier',  # Update with your GitHub URL
+    url='https://github.com/roby-avo/spacy-column-classifier',  # Keep your GitHub URL
     license='Apache License 2.0',
     packages=find_packages(),  # Automatically finds the 'column_classifier' package
     install_requires=[
