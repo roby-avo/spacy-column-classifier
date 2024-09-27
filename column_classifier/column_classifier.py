@@ -169,7 +169,7 @@ class ColumnClassifier:
         if avg_word_count > self.word_threshold:
             return {'classification': 'DESCRIPTION', 'probabilities': {'STRING': 1.0}}
 
-        concatenated_text = ' || '.join(sample_data.tolist())
+        concatenated_text = ' | '.join(sample_data.tolist())
 
         probabilities = self.classify_text(concatenated_text, num_rows, sample_data)
 
