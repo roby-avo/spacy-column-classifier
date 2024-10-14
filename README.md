@@ -103,29 +103,90 @@ Example Output
 
 After classifying your DataFrames, the output will be structured like this:
 ```bash
-{
-  "table_1": {
-    "title": {
-      "classification": "OTHER",
-      "probabilities": {
-        "OTHER": 1.0
+[
+  {
+    "table_1": {
+      "title": {
+        "classification": "OTHER",
+        "probabilities": {
+          "OTHER": 1.0
+        }
+      },
+      "director": {
+        "classification": "PERSON",
+        "probabilities": {
+          "PERSON": 1.0
+        }
+      },
+      "release year": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0,
+          "DATE": 1.0
+        }
+      },
+      "domestic distributor": {
+        "classification": "ORGANIZATION",
+        "probabilities": {
+          "ORGANIZATION": 1.0
+        }
+      },
+      "length in min": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0
+        }
+      },
+      "worldwide gross": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0
+        }
       }
-    },
-    "director": {
-      "classification": "PERSON",
-      "probabilities": {
-        "PERSON": 1.0
-      }
-    },
-    "release year": {
-      "classification": "NUMBER",
-      "probabilities": {
-        "NUMBER": 1.0,
-        "DATE": 0.5
+    }
+  },
+  {
+    "table_2": {
+      "company": {
+        "classification": "ORGANIZATION",
+        "probabilities": {
+          "ORGANIZATION": 1.0
+        }
+      },
+      "location": {
+        "classification": "LOCATION",
+        "probabilities": {
+          "LOCATION": 1.0
+        }
+      },
+      "founded": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0,
+          "DATE": 1.0
+        }
+      },
+      "CEO": {
+        "classification": "PERSON",
+        "probabilities": {
+          "PERSON": 1.0
+        }
+      },
+      "employees": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0
+        }
+      },
+      "revenue": {
+        "classification": "NUMBER",
+        "probabilities": {
+          "NUMBER": 1.0
+        }
       }
     }
   }
-}
+]
 ```
 
 Each column is classified with a winning classification, and the probabilities show the likelihood of different class types detected in the column.
