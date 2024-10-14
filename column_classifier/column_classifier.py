@@ -58,7 +58,7 @@ class ColumnClassifier:
     def classify_text_batch(self, texts, sample_data_list):
         """ Classify a batch of texts into high-level classes using SpaCy's nlp.pipe(). """
         results = []
-        for doc, sample_data in zip(self.nlp.pipe(texts, batch_size=50), sample_data_list):
+        for doc, sample_data in zip(self.nlp.pipe(texts, batch_size=1024), sample_data_list):
             num_rows = len(sample_data)
             entity_counts = {'LOCATION': 0, 'ORGANIZATION': 0, 'PERSON': 0, 'OTHER': 0}
             literal_counts = {'NUMBER': 0, 'DATE': 0, 'STRING': 0}
