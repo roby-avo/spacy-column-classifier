@@ -79,7 +79,7 @@ class ColumnClassifier:
             literal_counts['STRING'] += max(0, num_rows - len(doc.ents) - number_count)
 
             # Normalize the counts and ensure they are capped at 1
-            probabilities = {key: round(min(count / num_rows, 1), 2) 
+            probabilities = {key: round(min(count / num_rows, 1.0), 2) 
                              for key, count in {**entity_counts, **literal_counts}.items() if count > 0}
 
             # Default to 'STRING' if no entities detected
