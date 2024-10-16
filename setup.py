@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='column_classifier',
-    version='0.1.1',
+    version='0.1.3',
     description='A column classifier using spaCy for entity recognition.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',

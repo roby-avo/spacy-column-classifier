@@ -7,20 +7,18 @@ from tqdm import tqdm
 warnings.filterwarnings("ignore")
 
 class ColumnClassifier:
-    def __init__(self, model_type='accurate', sample_size=50, classification_threshold=0.5, close_prob_threshold=0.05, word_threshold=10):
+    def __init__(self, model_type='accurate', sample_size=50, classification_threshold=0.5, word_threshold=10):
         """
         Initialize the ColumnClassifier.
         Parameters:
         - model_type (str): 'accurate' for transformer-based (slow) model, 'fast' for small model.
         - sample_size (int): Number of samples to analyze per column.
         - classification_threshold (float): Minimum threshold for confident classification.
-        - close_prob_threshold (float): Threshold for considering two probabilities as "close".
         - word_threshold (int): Threshold for average word count to classify as DESCRIPTION.
         """
         self.model_type = model_type
         self.sample_size = sample_size
         self.classification_threshold = classification_threshold
-        self.close_prob_threshold = close_prob_threshold
         self.word_threshold = word_threshold
         
         # Load appropriate SpaCy model
@@ -90,37 +88,33 @@ class ColumnClassifier:
 
         return results
 
-    def resolve_conflict(self, probabilities: dict) -> str:
-        """ Resolve conflicts between similar probabilities for NE and LIT types, prioritizing NE. """
+    def classify_column(self, probabilities: dict) -> dict:
+        """ Classify a column based on the computed probabilities, applying the prioritization logic. """
         lit_types = ['NUMBER', 'DATE', 'STRING']
         ne_types = ['PERSON', 'LOCATION', 'ORGANIZATION', 'OTHER']
+        
+        # Step 1: Prioritize NER types if any have a probability >= classification_threshold
+        max_ne_type = max({key: probabilities[key] for key in ne_types if key in probabilities}, 
+                          key=probabilities.get, default=None)
+        if max_ne_type and probabilities[max_ne_type] >= self.classification_threshold:
+            return {'classification': max_ne_type, 'probabilities': probabilities}
 
+        # Step 2: Check if any literal type (LIT) has a probability >= classification_threshold
+        max_lit_type = max({key: probabilities[key] for key in lit_types if key in probabilities}, 
+                           key=probabilities.get, default=None)
+        if max_lit_type and probabilities[max_lit_type] >= self.classification_threshold:
+            return {'classification': max_lit_type, 'probabilities': probabilities}
+
+        # Step 3: If no NER type has a probability >= 0.5 and multiple NER types are detected, assign OTHER
+        total_ne_probability = sum(probabilities[key] for key in ne_types if key in probabilities)
+        if total_ne_probability >= self.classification_threshold:
+            return {'classification': 'OTHER', 'probabilities': probabilities}
+
+        # Step 4: If none of the above applies, return the type with the highest probability
         dominant_class = max(probabilities, key=probabilities.get)
-
-        # Check for conflict between NE and LIT types
-        if any(lit in probabilities for lit in lit_types) and any(ne in probabilities for ne in ne_types):
-            max_ne_type = max({key: probabilities[key] for key in ne_types if key in probabilities}, key=probabilities.get, default=None)
-            max_lit_type = max({key: probabilities[key] for key in lit_types if key in probabilities}, key=probabilities.get, default=None)
-
-            # Prefer NE type if probabilities are close
-            if max_ne_type and max_lit_type and abs(probabilities[max_ne_type] - probabilities[max_lit_type]) <= self.close_prob_threshold:
-                dominant_class = max_ne_type
-            elif probabilities[max_ne_type] >= probabilities[max_lit_type]:
-                dominant_class = max_ne_type
-
-        return dominant_class
-
-    def classify_column(self, probabilities: dict) -> dict:
-        """ Classify a column based on the computed probabilities, determining the winning class. """
-        # Apply classification threshold: default to STRING if confidence is low
-        max_prob = max(probabilities.values())
-        if max_prob < self.classification_threshold:
-            return {'classification': 'STRING', 'probabilities': {'STRING': 1.0}}
-
-        dominant_class = self.resolve_conflict(probabilities)
         return {'classification': dominant_class, 'probabilities': probabilities}
 
-    def classify_multiple_tables(self, tables: list) -> list:
+    def classify_multiple_tables(self, tables: list, separator=' | ') -> list:
         """ Classify all columns across multiple DataFrames and return probabilities using nlp.pipe(). """
         texts = []
         sample_data_list = []
@@ -135,7 +129,7 @@ class ColumnClassifier:
                     continue  # Skip empty columns
                 sample_size = min(self.sample_size, num_rows)
                 sample_data = non_na_data.sample(n=sample_size, random_state=1)
-                concatenated_text = ' | '.join(sample_data.tolist())
+                concatenated_text = separator.join(sample_data.tolist())
 
                 texts.append(concatenated_text)
                 sample_data_list.append(sample_data)
